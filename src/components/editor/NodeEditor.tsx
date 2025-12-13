@@ -1,9 +1,65 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useEditorStore } from '@/stores/editorStore';
 import type { Choice, Condition, Effect, Stats } from '@/types/game';
 import { STAT_META } from '@/types/game';
+
+// 자동완성 드롭다운 컴포넌트
+function AutocompleteInput({
+  value,
+  onChange,
+  suggestions,
+  placeholder,
+  className,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  suggestions: string[];
+  placeholder?: string;
+  className?: string;
+}) {
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const filteredSuggestions = suggestions.filter(
+    (s) => s.toLowerCase().includes(value.toLowerCase()) && s !== value
+  );
+
+  return (
+    <div className="relative">
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setShowSuggestions(true)}
+        onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+        placeholder={placeholder}
+        className={className}
+      />
+      {showSuggestions && filteredSuggestions.length > 0 && (
+        <div className="absolute z-10 top-full left-0 right-0 bg-[#f5f5f0] border border-[#c0c0b8] max-h-32 overflow-y-auto">
+          {filteredSuggestions.map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onMouseDown={() => {
+                onChange(suggestion);
+                setShowSuggestions(false);
+              }}
+              className="w-full text-left px-2 py-1 text-xs hover:bg-[#e0e0d8] text-[#2d2d2d]"
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
+      {suggestions.length > 0 && !showSuggestions && (
+        <div className="text-xs text-[#8b8b8b] mt-0.5">
+          기존: {suggestions.slice(0, 3).join(', ')}{suggestions.length > 3 ? '...' : ''}
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface EdgeData {
   choice?: Choice;
@@ -49,10 +105,17 @@ export default function NodeEditor() {
     deleteEdge,
     setStartScene,
     startSceneId,
+    getUsedElements,
   } = useEditorStore();
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
   const selectedEdge = edges.find((e) => e.id === selectedEdgeId);
+
+  // 사용 중인 요소 목록 (자동완성용)
+  const usedElements = useMemo(() => getUsedElements(), [nodes, edges, getUsedElements]);
+  const existingFlags = useMemo(() => usedElements.flags.map((f) => f.name), [usedElements]);
+  const existingItems = useMemo(() => usedElements.items.map((i) => i.id), [usedElements]);
+  const existingCharacters = useMemo(() => usedElements.characters.map((c) => c.name), [usedElements]);
 
   // 씬 편집 상태
   const [title, setTitle] = useState('');
@@ -466,41 +529,35 @@ export default function NodeEditor() {
                   /* 플래그 조건 */
                   <div>
                     <label className="block text-xs text-[#8b8b8b] mb-1">플래그 이름</label>
-                    <input
-                      type="text"
+                    <AutocompleteInput
                       value={conditionFlagName}
-                      onChange={(e) => setConditionFlagName(e.target.value)}
+                      onChange={setConditionFlagName}
+                      suggestions={existingFlags}
                       placeholder="예: gotSword, metKing"
                       className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-2 py-1.5 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
                     />
-                    <p className="text-xs text-[#8b8b8b] mt-1">
-                      이 플래그가 true일 때만 선택 가능
-                    </p>
                   </div>
                 ) : conditionType === 'item' ? (
                   /* 아이템 소지 조건 */
                   <div>
                     <label className="block text-xs text-[#8b8b8b] mb-1">아이템 ID</label>
-                    <input
-                      type="text"
+                    <AutocompleteInput
                       value={conditionItemId}
-                      onChange={(e) => setConditionItemId(e.target.value)}
+                      onChange={setConditionItemId}
+                      suggestions={existingItems}
                       placeholder="예: rusty-key, magic-potion"
                       className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-2 py-1.5 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
                     />
-                    <p className="text-xs text-[#8b8b8b] mt-1">
-                      이 아이템을 소지할 때만 선택 가능
-                    </p>
                   </div>
                 ) : (
                   /* 캐릭터 호감도 조건 */
                   <>
                     <div>
                       <label className="block text-xs text-[#8b8b8b] mb-1">캐릭터 이름</label>
-                      <input
-                        type="text"
+                      <AutocompleteInput
                         value={conditionCharacter}
-                        onChange={(e) => setConditionCharacter(e.target.value)}
+                        onChange={setConditionCharacter}
+                        suggestions={existingCharacters}
                         placeholder="예: 엘리스, 마왕"
                         className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-2 py-1.5 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
                       />
@@ -646,10 +703,10 @@ export default function NodeEditor() {
 
                     {effect.type === 'flag' && (
                       <div className="space-y-1">
-                        <input
-                          type="text"
+                        <AutocompleteInput
                           value={effect.target}
-                          onChange={(e) => handleUpdateEffect(index, { target: e.target.value })}
+                          onChange={(val) => handleUpdateEffect(index, { target: val })}
+                          suggestions={existingFlags}
                           placeholder="플래그 이름"
                           className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-2 py-1 text-[#2d2d2d] text-xs focus:outline-none"
                         />
@@ -690,10 +747,10 @@ export default function NodeEditor() {
                             className="bg-[#f5f5f0] border border-[#c0c0b8] px-1 py-1 text-[#2d2d2d] text-xs focus:outline-none"
                           />
                         </div>
-                        <input
-                          type="text"
+                        <AutocompleteInput
                           value={effect.target}
-                          onChange={(e) => handleUpdateEffect(index, { target: e.target.value })}
+                          onChange={(val) => handleUpdateEffect(index, { target: val })}
+                          suggestions={existingItems}
                           placeholder="아이템 ID (예: magic-key)"
                           className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-2 py-1 text-[#2d2d2d] text-xs focus:outline-none"
                         />
@@ -716,10 +773,10 @@ export default function NodeEditor() {
 
                     {effect.type === 'relation' && (
                       <div className="space-y-1">
-                        <input
-                          type="text"
+                        <AutocompleteInput
                           value={effect.target}
-                          onChange={(e) => handleUpdateEffect(index, { target: e.target.value })}
+                          onChange={(val) => handleUpdateEffect(index, { target: val })}
+                          suggestions={existingCharacters}
                           placeholder="캐릭터 이름 (예: 엘리스)"
                           className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-2 py-1 text-[#2d2d2d] text-xs focus:outline-none"
                         />

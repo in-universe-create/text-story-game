@@ -9,6 +9,15 @@ export interface SceneNodeData extends Record<string, unknown> {
 
 export interface ChoiceEdgeData extends Record<string, unknown> {
   choice?: Choice;
+  sourceEdgeIndex?: number;  // 같은 source에서 나가는 엣지 중 몇 번째인지
+  totalSourceEdges?: number; // 같은 source에서 나가는 엣지 총 개수
+}
+
+// 사용 중인 요소 목록 타입
+export interface UsedElements {
+  flags: { name: string; usedIn: string[] }[];
+  items: { id: string; name?: string; usedIn: string[] }[];
+  characters: { name: string; usedIn: string[] }[];
 }
 
 interface EditorStore {
@@ -48,6 +57,9 @@ interface EditorStore {
   exportStory: () => Story;
   importStory: (story: Story) => void;
   resetEditor: () => void;
+
+  // 사용 중인 요소 추출
+  getUsedElements: () => UsedElements;
 }
 
 const generateId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -175,6 +187,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       text: choiceUpdate.text ?? existingChoice.text,
       targetSceneId: choiceUpdate.targetSceneId ?? existingChoice.targetSceneId,
       condition: choiceUpdate.condition ?? existingChoice.condition,
+      conditionMode: choiceUpdate.conditionMode ?? existingChoice.conditionMode,
       effects: choiceUpdate.effects ?? existingChoice.effects,
     };
 
@@ -327,5 +340,76 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       selectedNodeId: null,
       selectedEdgeId: null,
     });
+  },
+
+  getUsedElements: () => {
+    const state = get();
+    const flagsMap = new Map<string, Set<string>>();
+    const itemsMap = new Map<string, { name?: string; usedIn: Set<string> }>();
+    const charactersMap = new Map<string, Set<string>>();
+
+    // 모든 노드(씬)와 엣지(선택지)를 순회
+    state.nodes.forEach((node) => {
+      const scene = node.data.scene;
+      const sceneLabel = scene.title || scene.id;
+
+      // 씬의 각 선택지 확인
+      scene.choices.forEach((choice) => {
+        const choiceLabel = `${sceneLabel} → ${choice.text}`;
+
+        // 조건에서 추출
+        if (choice.condition) {
+          const { type, target } = choice.condition;
+          if (type === 'flag' && target) {
+            if (!flagsMap.has(target)) flagsMap.set(target, new Set());
+            flagsMap.get(target)!.add(`[조건] ${choiceLabel}`);
+          } else if (type === 'item' && target) {
+            if (!itemsMap.has(target)) itemsMap.set(target, { usedIn: new Set() });
+            itemsMap.get(target)!.usedIn.add(`[조건] ${choiceLabel}`);
+          } else if (type === 'relation' && target) {
+            if (!charactersMap.has(target)) charactersMap.set(target, new Set());
+            charactersMap.get(target)!.add(`[조건] ${choiceLabel}`);
+          }
+        }
+
+        // 효과에서 추출
+        if (choice.effects) {
+          choice.effects.forEach((effect) => {
+            const { type, target, itemName } = effect;
+            if (type === 'flag' && target) {
+              if (!flagsMap.has(target)) flagsMap.set(target, new Set());
+              flagsMap.get(target)!.add(`[효과] ${choiceLabel}`);
+            } else if (type === 'item' && target) {
+              if (!itemsMap.has(target)) itemsMap.set(target, { usedIn: new Set() });
+              const item = itemsMap.get(target)!;
+              item.usedIn.add(`[효과] ${choiceLabel}`);
+              if (itemName) item.name = itemName;
+            } else if (type === 'relation' && target) {
+              if (!charactersMap.has(target)) charactersMap.set(target, new Set());
+              charactersMap.get(target)!.add(`[효과] ${choiceLabel}`);
+            }
+          });
+        }
+      });
+    });
+
+    // Map을 배열로 변환
+    const flags = Array.from(flagsMap.entries()).map(([name, usedIn]) => ({
+      name,
+      usedIn: Array.from(usedIn),
+    }));
+
+    const items = Array.from(itemsMap.entries()).map(([id, data]) => ({
+      id,
+      name: data.name,
+      usedIn: Array.from(data.usedIn),
+    }));
+
+    const characters = Array.from(charactersMap.entries()).map(([name, usedIn]) => ({
+      name,
+      usedIn: Array.from(usedIn),
+    }));
+
+    return { flags, items, characters };
   },
 }));

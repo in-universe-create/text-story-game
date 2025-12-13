@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -14,7 +14,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-import { useEditorStore, type SceneNodeData } from '@/stores/editorStore';
+import { useEditorStore, type SceneNodeData, type ChoiceEdgeData } from '@/stores/editorStore';
 import SceneNode from '@/components/editor/SceneNode';
 import ChoiceEdge from '@/components/editor/ChoiceEdge';
 import NodeEditor from '@/components/editor/NodeEditor';
@@ -49,15 +49,62 @@ export default function EditorPage() {
     deleteEdge,
   } = useEditorStore();
 
+  // 같은 source에서 나가는 엣지들에 인덱스 정보 추가
+  const edgesWithIndex = useMemo(() => {
+    // source별로 엣지 그룹화
+    const sourceGroups = new Map<string, Edge<ChoiceEdgeData>[]>();
+    storeEdges.forEach((edge) => {
+      const group = sourceGroups.get(edge.source) || [];
+      group.push(edge);
+      sourceGroups.set(edge.source, group);
+    });
+
+    // 각 엣지에 인덱스 정보 추가
+    return storeEdges.map((edge) => {
+      const group = sourceGroups.get(edge.source) || [];
+      const index = group.findIndex((e) => e.id === edge.id);
+      return {
+        ...edge,
+        data: {
+          ...edge.data,
+          sourceEdgeIndex: index,
+          totalSourceEdges: group.length,
+        },
+      };
+    });
+  }, [storeEdges]);
+
   // React Flow 상태와 스토어 연동
   const [nodes, setNodes, onNodesChange] = useNodesState(storeNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(storeEdges);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(edgesWithIndex);
+
+  // 인덱스 정보 추가 함수
+  const addEdgeIndexInfo = useCallback((edges: Edge<ChoiceEdgeData>[]) => {
+    const sourceGroups = new Map<string, Edge<ChoiceEdgeData>[]>();
+    edges.forEach((edge) => {
+      const group = sourceGroups.get(edge.source) || [];
+      group.push(edge);
+      sourceGroups.set(edge.source, group);
+    });
+    return edges.map((edge) => {
+      const group = sourceGroups.get(edge.source) || [];
+      const index = group.findIndex((e) => e.id === edge.id);
+      return {
+        ...edge,
+        data: {
+          ...edge.data,
+          sourceEdgeIndex: index,
+          totalSourceEdges: group.length,
+        },
+      };
+    });
+  }, []);
 
   // 스토어 변경 시 로컬 상태 업데이트
   const syncWithStore = useCallback(() => {
     setNodes(useEditorStore.getState().nodes);
-    setEdges(useEditorStore.getState().edges);
-  }, [setNodes, setEdges]);
+    setEdges(addEdgeIndexInfo(useEditorStore.getState().edges));
+  }, [setNodes, setEdges, addEdgeIndexInfo]);
 
   // 노드 변경 핸들러
   const handleNodesChange = useCallback(
@@ -179,7 +226,7 @@ export default function EditorPage() {
         >
           <ReactFlow
             nodes={storeNodes}
-            edges={storeEdges}
+            edges={edgesWithIndex}
             onNodesChange={handleNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}

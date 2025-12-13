@@ -11,6 +11,8 @@ import type { Choice } from '@/types/game';
 
 interface ChoiceEdgeData {
   choice: Choice;
+  sourceEdgeIndex?: number;
+  totalSourceEdges?: number;
 }
 
 interface ChoiceEdgeProps {
@@ -36,14 +38,23 @@ function ChoiceEdge({
   data,
   selected,
 }: ChoiceEdgeProps) {
+  // 같은 source에서 나가는 엣지들의 offset 계산
+  const sourceEdgeIndex = data?.sourceEdgeIndex ?? 0;
+  const totalSourceEdges = data?.totalSourceEdges ?? 1;
+
+  // 여러 엣지가 있을 때 offset 적용 (-30, 0, 30 등으로 분산)
+  const offsetStep = 25;
+  const baseOffset = -((totalSourceEdges - 1) * offsetStep) / 2;
+  const edgeOffset = baseOffset + sourceEdgeIndex * offsetStep;
+
   const [edgePath, labelX, labelY] = getSmoothStepPath({
-    sourceX,
+    sourceX: sourceX + edgeOffset,
     sourceY,
     sourcePosition,
-    targetX,
+    targetX: targetX + edgeOffset * 0.5,
     targetY,
     targetPosition,
-    borderRadius: 0,
+    borderRadius: 8,
   });
 
   const choice = data?.choice;

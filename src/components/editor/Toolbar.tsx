@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useEditorStore } from '@/stores/editorStore';
+import { useEditorStore, type UsedElements } from '@/stores/editorStore';
 import { sampleStory } from '@/data/sampleStory';
 import { loadStoryIndex } from '@/lib/storyLoader';
 
@@ -18,9 +18,12 @@ export default function Toolbar() {
     resetEditor,
     nodes,
     startSceneId,
+    getUsedElements,
   } = useEditorStore();
 
   const [showMeta, setShowMeta] = useState(false);
+  const [showElements, setShowElements] = useState(false);
+  const [usedElements, setUsedElements] = useState<UsedElements | null>(null);
   const [title, setTitle] = useState(storyTitle);
   const [description, setDescription] = useState(storyDescription);
   const [code, setCode] = useState(storyCode);
@@ -195,6 +198,16 @@ export default function Toolbar() {
               코드: {storyCode}
             </span>
           )}
+
+          <button
+            onClick={() => {
+              setUsedElements(getUsedElements());
+              setShowElements(true);
+            }}
+            className="px-2 py-1 bg-[#e0e0d8] hover:bg-[#d0d0c8] text-[#4d4d4d] text-xs border border-[#b0b0a8]"
+          >
+            플래그/아이템/캐릭터 목록
+          </button>
         </div>
 
         {/* 우측: 액션 버튼들 */}
@@ -318,6 +331,116 @@ export default function Toolbar() {
                 className="px-4 py-2 bg-[#3d3d3d] hover:bg-[#2d2d2d] text-[#f5f5f0]"
               >
                 저장
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 사용 중인 요소 목록 모달 */}
+      {showElements && usedElements && (
+        <div className="fixed inset-0 bg-[#f5f5f0]/90 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#f5f5f0] w-full max-w-2xl max-h-[80vh] border border-[#a0a098] flex flex-col">
+            <div className="p-4 border-b border-[#c0c0b8] flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#2d2d2d]">사용 중인 요소 목록</h3>
+              <button
+                onClick={() => setShowElements(false)}
+                className="text-[#6b6b6b] hover:text-[#2d2d2d] text-xl"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-4 overflow-y-auto flex-1 space-y-6">
+              {/* 플래그 목록 */}
+              <div>
+                <h4 className="text-sm font-bold text-[#3d3d3d] mb-2 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                  플래그 ({usedElements.flags.length})
+                </h4>
+                {usedElements.flags.length === 0 ? (
+                  <p className="text-sm text-[#8b8b8b] ml-5">사용 중인 플래그가 없습니다</p>
+                ) : (
+                  <div className="space-y-2 ml-5">
+                    {usedElements.flags.map((flag) => (
+                      <div key={flag.name} className="bg-[#eaeae5] border border-[#c0c0b8] p-2">
+                        <div className="font-mono text-sm text-[#2d2d2d] font-medium">{flag.name}</div>
+                        <div className="text-xs text-[#6b6b6b] mt-1">
+                          {flag.usedIn.map((usage, i) => (
+                            <div key={i}>• {usage}</div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 아이템 목록 */}
+              <div>
+                <h4 className="text-sm font-bold text-[#3d3d3d] mb-2 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  아이템 ({usedElements.items.length})
+                </h4>
+                {usedElements.items.length === 0 ? (
+                  <p className="text-sm text-[#8b8b8b] ml-5">사용 중인 아이템이 없습니다</p>
+                ) : (
+                  <div className="space-y-2 ml-5">
+                    {usedElements.items.map((item) => (
+                      <div key={item.id} className="bg-[#eaeae5] border border-[#c0c0b8] p-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-sm text-[#2d2d2d] font-medium">{item.id}</span>
+                          {item.name && <span className="text-sm text-[#6b6b6b]">({item.name})</span>}
+                        </div>
+                        <div className="text-xs text-[#6b6b6b] mt-1">
+                          {item.usedIn.map((usage, i) => (
+                            <div key={i}>• {usage}</div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 캐릭터 목록 */}
+              <div>
+                <h4 className="text-sm font-bold text-[#3d3d3d] mb-2 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-pink-500 rounded-full"></span>
+                  캐릭터 (호감도) ({usedElements.characters.length})
+                </h4>
+                {usedElements.characters.length === 0 ? (
+                  <p className="text-sm text-[#8b8b8b] ml-5">사용 중인 캐릭터가 없습니다</p>
+                ) : (
+                  <div className="space-y-2 ml-5">
+                    {usedElements.characters.map((char) => (
+                      <div key={char.name} className="bg-[#eaeae5] border border-[#c0c0b8] p-2">
+                        <div className="font-mono text-sm text-[#2d2d2d] font-medium">{char.name}</div>
+                        <div className="text-xs text-[#6b6b6b] mt-1">
+                          {char.usedIn.map((usage, i) => (
+                            <div key={i}>• {usage}</div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {usedElements.flags.length === 0 && usedElements.items.length === 0 && usedElements.characters.length === 0 && (
+                <div className="text-center py-8 text-[#8b8b8b]">
+                  <p>아직 설정된 플래그, 아이템, 캐릭터가 없습니다.</p>
+                  <p className="text-sm mt-2">선택지의 효과나 조건을 추가하면 여기에 표시됩니다.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-[#c0c0b8] flex justify-end">
+              <button
+                onClick={() => setShowElements(false)}
+                className="px-4 py-2 bg-[#3d3d3d] hover:bg-[#2d2d2d] text-[#f5f5f0]"
+              >
+                닫기
               </button>
             </div>
           </div>
