@@ -1,72 +1,71 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { storyList } from '@/data/sampleStory';
-import { getAutoSave, getSaveSlots } from '@/lib/saveManager';
 
 export default function Home() {
-  const [hasSaves, setHasSaves] = useState(false);
-  const [hasAutoSave, setHasAutoSave] = useState(false);
+  const router = useRouter();
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
 
-  useEffect(() => {
-    setHasSaves(getSaveSlots().length > 0);
-    setHasAutoSave(!!getAutoSave());
-  }, []);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedCode = code.trim();
+
+    if (!trimmedCode) {
+      setError('코드를 입력해주세요.');
+      return;
+    }
+
+    setError('');
+    router.push(`/s/${trimmedCode}`);
+  };
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8">
-      {/* 타이틀 */}
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-[#2d2d2d] mb-4">
-          스토리 게임
-        </h1>
-        <p className="text-[#6b6b6b] text-lg">
-          당신의 선택이 운명을 바꿉니다
+      {/* 메인 메시지 */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-[#2d2d2d] mb-4">스토리 게임</h1>
+        <p className="text-[#6b6b6b]">
+          전달받은 코드를 입력하세요.
         </p>
       </div>
 
-      {/* 메뉴 버튼들 */}
-      <div className="flex flex-col gap-4 w-full max-w-md">
-        {/* 스토리 선택 */}
-        <div className="bg-[#eaeae5] p-6 border border-[#c0c0b8]">
-          <h2 className="text-xl font-bold text-[#2d2d2d] mb-4">스토리 선택</h2>
-          <div className="space-y-3">
-            {storyList.map((story) => (
-              <Link
-                key={story.id}
-                href={`/play?story=${story.id}`}
-                className="block p-4 bg-[#f5f5f0] hover:bg-[#e0e0d8] transition-all hover:translate-x-2 border border-[#c0c0b8] hover:border-[#a0a098]"
-              >
-                <h3 className="text-[#2d2d2d] font-medium">{story.title}</h3>
-                <p className="text-[#6b6b6b] text-sm mt-1">{story.description}</p>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* 이어하기 (세이브가 있을 때) */}
-        {(hasSaves || hasAutoSave) && (
-          <Link
-            href="/play?load=true"
-            className="p-4 bg-[#e0e0d8] hover:bg-[#d0d0c8] text-[#2d2d2d] text-center transition-all border border-[#c0c0b8] hover:border-[#a0a098]"
+      {/* 코드 입력 폼 */}
+      <form onSubmit={handleSubmit} className="w-full max-w-sm">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={code}
+            onChange={(e) => {
+              setCode(e.target.value);
+              setError('');
+            }}
+            placeholder="코드 입력"
+            className="flex-1 bg-[#f5f5f0] border border-[#c0c0b8] px-4 py-3 text-[#2d2d2d] text-center text-lg tracking-widest focus:outline-none focus:border-[#808080]"
+            autoFocus
+          />
+          <button
+            type="submit"
+            className="px-6 py-3 bg-[#3d3d3d] hover:bg-[#2d2d2d] text-[#f5f5f0] font-bold transition-colors"
           >
-            이어하기
-          </Link>
+            입장
+          </button>
+        </div>
+        {error && (
+          <p className="text-red-600 text-sm mt-2 text-center">{error}</p>
         )}
+      </form>
 
-        {/* 에디터 */}
+      {/* 하단 관리자 링크 */}
+      <footer className="fixed bottom-4 text-center">
         <Link
-          href="/editor"
-          className="p-4 bg-[#e0e0d8] hover:bg-[#d0d0c8] text-[#4d4d4d] text-center transition-all border border-[#c0c0b8] hover:border-[#a0a098]"
+          href="/admin"
+          className="text-[#a0a098] hover:text-[#6b6b6b] text-xs"
         >
-          스토리 에디터
+          관리자
         </Link>
-      </div>
-
-      {/* 푸터 */}
-      <footer className="mt-16 text-[#8b8b8b] text-sm">
-        텍스트 선택 기반 스토리 게임 엔진
       </footer>
     </main>
   );

@@ -24,6 +24,8 @@ interface GameStore {
   addItem: (item: Item) => void;
   removeItem: (itemId: string, quantity?: number) => void;
   setFlag: (flag: string, value: boolean) => void;
+  setCharacterRelation: (character: string, value: number) => void;
+  updateCharacterRelation: (character: string, delta: number) => void;
   setAnimating: (isAnimating: boolean) => void;
   resetGame: () => void;
   setGameState: (state: GameState) => void;
@@ -52,6 +54,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       stats: { ...story.initialStats },
       inventory: [...story.initialItems],
       flags: {},
+      characterRelations: {},
       history: [story.startSceneId],
       playTime: 0,
     };
@@ -140,8 +143,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           if (effect.action === 'add') {
             get().addItem({
               id: effect.target,
-              name: effect.target,
-              description: '',
+              name: effect.itemName || effect.target,
+              description: effect.itemDescription || '',
               quantity: effect.value as number,
             });
           } else if (effect.action === 'remove') {
@@ -151,6 +154,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
         case 'flag':
           get().setFlag(effect.target, effect.value as boolean);
+          break;
+
+        case 'relation':
+          const currentRelation = gameState.characterRelations[effect.target] || 0;
+          let newRelation: number;
+          if (effect.action === 'add') {
+            newRelation = currentRelation + (effect.value as number);
+          } else if (effect.action === 'remove') {
+            newRelation = currentRelation - (effect.value as number);
+          } else {
+            newRelation = effect.value as number;
+          }
+          get().setCharacterRelation(effect.target, newRelation);
           break;
       }
     });
@@ -175,6 +191,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
         break;
       case 'flag':
         currentValue = gameState.flags[condition.target] ?? false;
+        break;
+      case 'relation':
+        currentValue = gameState.characterRelations[condition.target] ?? 0;
         break;
       default:
         return false;
@@ -261,6 +280,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
       gameState: {
         ...gameState,
         flags: { ...gameState.flags, [flag]: value },
+      },
+    });
+  },
+
+  setCharacterRelation: (character, value) => {
+    const { gameState } = get();
+    if (!gameState) return;
+
+    set({
+      gameState: {
+        ...gameState,
+        characterRelations: { ...gameState.characterRelations, [character]: value },
+      },
+    });
+  },
+
+  updateCharacterRelation: (character, delta) => {
+    const { gameState } = get();
+    if (!gameState) return;
+
+    const currentValue = gameState.characterRelations[character] || 0;
+    set({
+      gameState: {
+        ...gameState,
+        characterRelations: { ...gameState.characterRelations, [character]: currentValue + delta },
       },
     });
   },

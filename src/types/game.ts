@@ -1,6 +1,6 @@
 // 조건 (선택지 표시 조건)
 export interface Condition {
-  type: 'stat' | 'item' | 'flag';
+  type: 'stat' | 'item' | 'flag' | 'relation';
   target: string;
   operator: 'gt' | 'gte' | 'lt' | 'lte' | 'eq' | 'neq' | 'has';
   value: number | string | boolean;
@@ -8,10 +8,13 @@ export interface Condition {
 
 // 효과 (스탯/아이템 변경)
 export interface Effect {
-  type: 'stat' | 'item' | 'flag';
+  type: 'stat' | 'item' | 'flag' | 'relation';
   target: string;
   action: 'add' | 'remove' | 'set';
   value: number | string | boolean;
+  // 아이템 효과용 추가 필드
+  itemName?: string;
+  itemDescription?: string;
 }
 
 // 선택지
@@ -20,6 +23,7 @@ export interface Choice {
   text: string;
   targetSceneId: string;
   condition?: Condition;
+  conditionMode?: 'enable' | 'disable';  // enable: 조건 충족 시 선택 가능, disable: 조건 충족 시 선택 불가
   effects?: Effect[];
 }
 
@@ -39,6 +43,8 @@ export interface Story {
   id: string;
   title: string;
   description: string;
+  code?: string;           // 접근 코드 (예: abc123)
+  fileName?: string;       // 파일명 (예: my-story)
   startSceneId: string;
   scenes: Scene[];
   initialStats: Stats;
@@ -75,6 +81,7 @@ export interface GameState {
   stats: Stats;
   inventory: Item[];
   flags: Record<string, boolean>;
+  characterRelations: Record<string, number>;  // 캐릭터별 호감도
   history: string[];
   playTime: number;
 }

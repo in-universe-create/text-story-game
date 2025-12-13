@@ -1,9 +1,9 @@
 import type { Story } from '@/types/game';
 import { DEFAULT_STATS } from '@/types/game';
 
-export const sampleStory: Story = {
-  "id": "1765604428175-phyn1x9",
-  "title": "새 스토리",
+export const oceanStory: Story = {
+  "id": "oceanStoryMistary",
+  "title": "something",
   "description": "스토리 설명을 입력하세요",
   "startSceneId": "1765604441749-ms9suc4",
   "scenes": [

@@ -20,6 +20,8 @@ interface EditorStore {
   storyId: string;
   storyTitle: string;
   storyDescription: string;
+  storyCode: string;        // 접근 코드
+  storyFileName: string;    // 파일명
   initialStats: Stats;
   initialItems: Item[];
   startSceneId: string;
@@ -40,7 +42,7 @@ interface EditorStore {
   setSelectedNode: (nodeId: string | null) => void;
   setSelectedEdge: (edgeId: string | null) => void;
   setStartScene: (sceneId: string) => void;
-  updateStoryMeta: (meta: Partial<{ title: string; description: string; initialStats: Stats; initialItems: Item[] }>) => void;
+  updateStoryMeta: (meta: Partial<{ title: string; description: string; code: string; fileName: string; initialStats: Stats; initialItems: Item[] }>) => void;
 
   // 스토리 내보내기/가져오기
   exportStory: () => Story;
@@ -62,12 +64,24 @@ const DEFAULT_INITIAL_STATS: Stats = {
   gold: 100,
 };
 
+// 짧은 코드 생성
+const generateCode = (length: number = 6): string => {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+};
+
 export const useEditorStore = create<EditorStore>((set, get) => ({
   nodes: [],
   edges: [],
   storyId: generateId(),
   storyTitle: '새 스토리',
   storyDescription: '스토리 설명을 입력하세요',
+  storyCode: generateCode(),
+  storyFileName: 'new-story',
   initialStats: { ...DEFAULT_INITIAL_STATS },
   initialItems: [],
   startSceneId: '',
@@ -237,6 +251,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set((state) => ({
       storyTitle: meta.title ?? state.storyTitle,
       storyDescription: meta.description ?? state.storyDescription,
+      storyCode: meta.code ?? state.storyCode,
+      storyFileName: meta.fileName ?? state.storyFileName,
       initialStats: meta.initialStats ?? state.initialStats,
       initialItems: meta.initialItems ?? state.initialItems,
     }));
@@ -250,6 +266,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       id: state.storyId,
       title: state.storyTitle,
       description: state.storyDescription,
+      code: state.storyCode,
+      fileName: state.storyFileName,
       startSceneId: state.startSceneId,
       scenes,
       initialStats: state.initialStats,
@@ -282,6 +300,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       storyId: story.id,
       storyTitle: story.title,
       storyDescription: story.description,
+      storyCode: story.code || generateCode(),
+      storyFileName: story.fileName || 'imported-story',
       startSceneId: story.startSceneId,
       initialStats: story.initialStats,
       initialItems: story.initialItems,
@@ -299,6 +319,8 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       storyId: generateId(),
       storyTitle: '새 스토리',
       storyDescription: '스토리 설명을 입력하세요',
+      storyCode: generateCode(),
+      storyFileName: 'new-story',
       initialStats: { ...DEFAULT_INITIAL_STATS },
       initialItems: [],
       startSceneId: '',

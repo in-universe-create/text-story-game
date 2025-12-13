@@ -1,0 +1,478 @@
+{
+  "id": "1765604428175-phyn1x9",
+  "title": "수상한 움직임",
+  "description": "오늘은 새로운 그룹의 런칭일이다. 엔터테인먼트 회사 내부는 늘 그렇듯 완벽하게 돌아간다. 그러나 익숙해야 할 절차와 문서, 지나치게 정돈된 공간과 설명되지 않는 기준들 속에서 당신은 점점 작은 어긋남을 느끼기 시작한다.",
+  "code": "ocean",
+  "fileName": "ocean-mystery",
+  "startSceneId": "1765604441749-ms9suc4",
+  "scenes": [
+    {
+      "id": "1765604441749-ms9suc4",
+      "title": "런칭",
+      "text": "오늘은 새로운 그룹의 런칭일이다.\n런칭. 어감에서 오는 불편함이 입 속을 맴돈다. \n\n이번 데뷔팀을 구성하는 조직에서 사용하는 단어 하나하나 수정하는 것이 이상해 가만히 두었던 게 문화로 자리 잡고 말았다. \n\n멤버들의 최종 프로필을 확인하며 이사실에 들어간다.\n\n그러다, \n문득\n이질감이 느껴진다.\n\n무엇이 이질감을 불러일으키는 걸까. \n",
+      "choices": [
+        {
+          "id": "1765605311260-ddarx4o",
+          "text": "이사실의 물리적인 상태를 살핀다",
+          "targetSceneId": "1765604442384-d51i4vd",
+          "effects": [
+            {
+              "type": "flag",
+              "target": "crum-plag",
+              "action": "add",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "1765611574705-btgksl4",
+          "text": "멤버들의 프로필을 다시 확인한다",
+          "targetSceneId": "1765611559640-oikqes8"
+        },
+        {
+          "id": "1765611814617-1vl1lwj",
+          "text": "런칭. ",
+          "targetSceneId": "1765611677893-1i25mmh"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765604442384-d51i4vd",
+      "title": "이사실",
+      "text": "이사실은 지나치게 깨끗하다. \n청소가 잘 된 수준이 아니라, 생활의 흔적 자체가 제거된 상태. \n\n책상 모서리에 손을 대는 순간, \n미세한 끈적임이 느껴진다.\n보이지 않을 만큼 얇은 층의 무언가. \n",
+      "choices": [
+        {
+          "id": "1765605855114-we9x4s6",
+          "text": "끈적이는 무언가를 확인한다",
+          "targetSceneId": "1765605283016-nffxewp",
+          "condition": {
+            "type": "flag",
+            "target": "crum-plag",
+            "operator": "eq",
+            "value": true
+          },
+          "effects": [
+            {
+              "type": "stat",
+              "target": "hp",
+              "action": "remove",
+              "value": 10
+            },
+            {
+              "type": "stat",
+              "target": "stress",
+              "action": "add",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "id": "1765605932357-3lch3z0",
+          "text": "청소 기록을 확인한다",
+          "targetSceneId": "1765605290080-yozzmzd",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "stress",
+              "action": "add",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "id": "1765607584286-svnk02z",
+          "text": "책상 서랍",
+          "targetSceneId": "1765605289204-vjcp4te"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765605283016-nffxewp",
+      "title": "?",
+      "text": "손가락을 다시 책상 모서리에 댄다.\n\n끈적임은\n말라붙은 설탕처럼 보이지만\n온기가 남아 있다.\n\n천천히,\n아주 천천히 손가락을 떼자\n얇은 실처럼 늘어진다. \n\n그 순간\n가슴 안쪽이 살짝\n정말 아주 살짝\n꺼진 느낌이 든다. ",
+      "choices": [
+        {
+          "id": "1765620805786-9543rk4",
+          "text": "채취한다",
+          "targetSceneId": "1765604442384-d51i4vd",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "hp",
+              "action": "add",
+              "value": 10
+            },
+            {
+              "type": "stat",
+              "target": "stress",
+              "action": "add",
+              "value": 10
+            },
+            {
+              "type": "item",
+              "target": "your-crum",
+              "action": "add",
+              "value": 1,
+              "itemName": "응고된 크럼",
+              "itemDescription": "끈적하고 달달한 향이 난다. "
+            },
+            {
+              "type": "flag",
+              "target": "crum-plag",
+              "action": "set",
+              "value": false
+            }
+          ]
+        },
+        {
+          "id": "1765621016528-nqwnaqr",
+          "text": "닦아낸다",
+          "targetSceneId": "1765604442384-d51i4vd",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "stress",
+              "action": "remove",
+              "value": 10
+            },
+            {
+              "type": "flag",
+              "target": "crum-plag",
+              "action": "set",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765605289204-vjcp4te",
+      "title": "알 수 없는 서류",
+      "text": "서랍은 잠겨 있지 않다.\n열리는 감각이 너무 매끄럽다. \n\n안에는 파일 하나만 놓여 있다.\n표지는 새것이다.\n이 회사의 서식도, 정부 문서 양식도 아니다. \n\n제목은 짧다. \n<대체 가능 인원 보고>",
+      "choices": [
+        {
+          "id": "1765607314861-1dlvggg",
+          "text": "대체 가능 인원 보고",
+          "targetSceneId": "1765606865155-lzrjo1c"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765605290080-yozzmzd",
+      "title": "보고되지 않은 문서",
+      "text": "태블릿을 켜자\n시설 관리 로그가 자동으로 열린다.\n\n청소 주기 : 매일 3회\n특이 사항 : 유기물 잔여물 제거\n\n분류 기준이 이상하다.\n\n머리카락, 혈흔, 체액...\n그리고 별도 항목.\n\n\"당분 잔여물\"\n\n언제부터 이런 형태의 시설 관리 보고서가 작성되고 있었던 거지? \n본능적인 불쾌감이 오른다. ",
+      "choices": [
+        {
+          "id": "1765631418421-0s35y46",
+          "text": "기록 담당자를 확인한다",
+          "targetSceneId": "1765631401199-trglnut",
+          "effects": [
+            {
+              "type": "flag",
+              "target": "cleanFlag",
+              "action": "add",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "1765631546745-56arom9",
+          "text": "청소 기준을 수정한다",
+          "targetSceneId": "1765631000432-lho0u0v",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "reputation",
+              "action": "remove",
+              "value": 5
+            },
+            {
+              "type": "flag",
+              "target": "cleanChangeFlag",
+              "action": "add",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765606865155-lzrjo1c",
+      "title": "대체 가능 인원 보고?",
+      "text": "페이지마다\n아이돌 그룹 멤버의 프로필이 적혀 있다.\n\n이상한 점은,\n지금 막 런칭할 예정인 그룹의 멤버와 거의 동일하다는 것.\n\n키, 얼굴형, 음색 범위, 팬 반응 예측.\n모두 일치한다. \n\n단 하나만 다르다. \n\n- 현 멤버 : 김유솔\n- 대체 멤버 : 김유솔 (사용 가능) \n\n사진이 붙어 있다. \n분명 같은 얼굴인데\n눈빛이 다르다. ",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765611559640-oikqes8",
+      "title": "프로필",
+      "text": "프로필은 완벽하다. \n키, 체중, 혈액형, 취미, 특기.\n어느 하나 빠진 것이 없다. \n\n그런데 이상하다. \n모두 '식성' 항목이 비어 있다. \n\n의도적으로 지운 흔적. \n아니면, 애초에 적을 수 없는 항목.\n\n...\n잠깐, 원래 프로필이 이런 구조였나? ",
+      "choices": [
+        {
+          "id": "1765612109415-d19kwjd",
+          "text": "식성 항목을 만든 사람을 찾는다",
+          "targetSceneId": "1765611572408-z8cxw4s"
+        },
+        {
+          "id": "1765628961542-hffeeq6",
+          "text": "평가 기준에 포함시킨다",
+          "targetSceneId": "1765620646069-oewok5k",
+          "effects": [
+            {
+              "type": "flag",
+              "target": "무지한 승인",
+              "action": "add",
+              "value": true
+            },
+            {
+              "type": "flag",
+              "target": "자기 유통 가속",
+              "action": "add",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "1765629100158-649xkq7",
+          "text": "사내 통합검색 프로그램에 프로필을 검색한다",
+          "targetSceneId": "1765620649728-xjtuvc3"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765611572408-z8cxw4s",
+      "title": "새로운 인물",
+      "text": "문서 수정 이력을 연다. \n최근 입사자 명단과 겹치는 이름 하나. \n\n이 업계 경력은 짧다. \n대신 이력서에는 \n'감각 분석', '체험 설계'라는 단어가 반복된다. ",
+      "choices": [
+        {
+          "id": "1765629920963-gtzq80d",
+          "text": "담당 프로젝트를 확인한다",
+          "targetSceneId": "1765629906725-f0c9ccw",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "intelligence",
+              "action": "add",
+              "value": 10
+            },
+            {
+              "type": "stat",
+              "target": "stress",
+              "action": "add",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "id": "1765630628720-wzzbtya",
+          "text": "입사 경로를 추적한다",
+          "targetSceneId": "1765630619469-ujju5z0",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "intelligence",
+              "action": "add",
+              "value": 10
+            },
+            {
+              "type": "stat",
+              "target": "reputation",
+              "action": "remove",
+              "value": 5
+            },
+            {
+              "type": "flag",
+              "target": "widePower",
+              "action": "add",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "1765630850985-afwrkxc",
+          "text": "직접 호출한다",
+          "targetSceneId": "1765630837906-qlumaca",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "relationship",
+              "action": "remove",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "id": "1765631004086-hnmacl6",
+          "text": "덮어두고 기억만 한다",
+          "targetSceneId": "1765630998567-31297s1",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "stress",
+              "action": "remove",
+              "value": 10
+            },
+            {
+              "type": "stat",
+              "target": "reputation",
+              "action": "add",
+              "value": 10
+            }
+          ]
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765611677893-1i25mmh",
+      "title": "런칭",
+      "text": "런칭.\n출시.\n공개. \n\n",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765620646069-oewok5k",
+      "title": "승인",
+      "text": "잠시 고민하다 결재 버튼을 누른다. \n\n- 빈 항목이면 채우면 되겠지. ",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765620649728-xjtuvc3",
+      "title": "검색창",
+      "text": "... ...",
+      "choices": [
+        {
+          "id": "1765629187854-7z5b4ni",
+          "text": "혜성",
+          "targetSceneId": "1765629177823-v9guopb",
+          "effects": [
+            {
+              "type": "item",
+              "target": "history-hs",
+              "action": "add",
+              "value": 1,
+              "itemName": "혜성 프로필 열람 이력"
+            }
+          ]
+        },
+        {
+          "id": "1765629192437-irh7ku9",
+          "text": "도산호",
+          "targetSceneId": "1765621021798-8n54o4e",
+          "effects": [
+            {
+              "type": "item",
+              "target": "history-sh",
+              "action": "add",
+              "value": 1,
+              "itemName": "산호 프로필 열람 이력"
+            },
+            {
+              "type": "relation",
+              "target": "도산호",
+              "action": "remove",
+              "value": 10
+            }
+          ]
+        },
+        {
+          "id": "1765629236412-2sjhegr",
+          "text": "장해우",
+          "targetSceneId": "1765629231353-uv0lk6g",
+          "effects": [
+            {
+              "type": "item",
+              "target": "history-admin",
+              "action": "add",
+              "value": 1,
+              "itemName": "관리자 프로필 열람 기록"
+            }
+          ]
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765621021798-8n54o4e",
+      "title": "도산호",
+      "text": "도산호.\n\n활동명 산호\n소속 작곡가\n준 아티스트\n\n식성: 비공개",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765629177823-v9guopb",
+      "title": "혜성",
+      "text": "김혜성(혜성)\n\n그룹 애프터데이\n포지션 보컬 \n\n...\n\n식성 : 레몬 딜 ",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765629231353-uv0lk6g",
+      "title": "장해우",
+      "text": "검색창에 장해우를 입력한다. \n\n이사. \n관리자.\n\n프로필은 존재한다. \n외부에는 공개되지 않은 내부용. \n\n그리고 \n당신이 한 번도 작성하지 않은 항목이 보인다. \n\n식성: 비공개 \n\n왜 비공개지?\n누구에게서 숨기는 거지?",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765629906725-f0c9ccw",
+      "title": "파일럿: 체험형 감각 피드백",
+      "text": "프로젝트 목록을 연다. \n정신 프로젝트는 없다. \n\n대신 임시 폴더 하나.\n\n<파일럿: 체험형 감각 피드백>\n참여 대상: 비공개\n결과 보고 대상: 상부 \n\n그래프 하나가 첨부되어 있다. \n심박, 안정도, 당 반응 곡선.\n\n익숙하다. \n당신의 최근 건강검진 보고서와 형식이 거의 동일하다. \n\n",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765630619469-ujju5z0",
+      "title": "포 센서블",
+      "text": "인사 기록을 더 거슬러 올라간다. \n추천인 항목은 비어있다. \n\n대신 낯선 문구. \n\n\"외부 협력 경로 전환 채용\"\n\n첨부 계약서의 로고는 이 회사 것이 아니다. \n어디선가 이 회사를 통과지점으로 사용하는 느낌이 든다. \n\n계약서 로고를 살펴보면 for sensible 이라고 적혀있다.",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765630837906-qlumaca",
+      "title": "이승윤",
+      "text": "내선을 누르자 \n바로 연결된다. \n\n\"아, 이사님.\"\n\n이름을 말하지 않았는데도 그는 주저하지 않는다. \n\n\"아... 식성이요.\"\n\"아직 테스트 단계라서요.\"\n\n잠깐의 침묵.\n\n\"걱정 안하셔도 됩니다. 이사님은 아직 대상이 아니니까요.\"",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765630998567-31297s1",
+      "title": "...",
+      "text": "지금은 런칭 당일이다. \n확인할 일은 많고 이런 문제는 나중에 해도 된다. \n\n당신은 창을 닫는다. \n다만 이름만은 기억해 둔다. \n\n그날 밤, \n메일함에 비공개 보고서 하나가 도착한다. \n\n<식성 항목 시범 적용 결과> \n수신자: 일부 관리자\n참조: 장해우 이사\n\n이미 다음 단계로 넘어간 문서다.",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765631000432-lho0u0v",
+      "title": "특수 관리 대상",
+      "text": "당신은 관리자 메뉴에 접근한다. \n청소 기준을 '일반 사무 공간'으로 변경한다. \n\n저장 버튼을 누르자\n경고창이 뜬다. \n\n\"해당 공간은 특수 관리 대상입니다.\"\n\n사유는 적혀 있지 않다. \n당신은 한 번 더 누른다. \n\n변경은 된다. \n그러나 로그가 남는다. ",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765631401199-trglnut",
+      "title": "S-3",
+      "text": "청소 보고서 하단에 담당자 코드가 찍혀 있다. \n\n실명이 아니다. \n외주 업체 코드도 아니다. \n\n관리 분류: S-3\n\n이 분류는 당신이 승인한 적 없는 체계다. \n\n담당자 내선을 눌렀을 때, 잠시 정적이 흐른다. \n\n\"아... 그 기록이요?\"\n\"원래 그렇게 처리되고 있습니다.\"\n\n그는 더 설명하지 않는다. ",
+      "choices": [],
+      "isEnding": false
+    }
+  ],
+  "initialStats": {
+    "hp": 100,
+    "maxHp": 100,
+    "strength": 10,
+    "intelligence": 10,
+    "agility": 10,
+    "stress": 0,
+    "reputation": 50,
+    "relationship": 50,
+    "gold": 100
+  },
+  "initialItems": []
+}
