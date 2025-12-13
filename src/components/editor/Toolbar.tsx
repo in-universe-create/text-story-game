@@ -4,7 +4,8 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useEditorStore, type UsedElements } from '@/stores/editorStore';
 import { sampleStory } from '@/data/sampleStory';
-import { loadStoryIndex } from '@/lib/storyLoader';
+import { loadStoryIndex, loadAllStories } from '@/lib/storyLoader';
+import type { Story } from '@/types/game';
 
 export default function Toolbar() {
   const {
@@ -23,7 +24,10 @@ export default function Toolbar() {
 
   const [showMeta, setShowMeta] = useState(false);
   const [showElements, setShowElements] = useState(false);
+  const [showStoryList, setShowStoryList] = useState(false);
   const [usedElements, setUsedElements] = useState<UsedElements | null>(null);
+  const [savedStories, setSavedStories] = useState<Story[]>([]);
+  const [loadingStories, setLoadingStories] = useState(false);
   const [title, setTitle] = useState(storyTitle);
   const [description, setDescription] = useState(storyDescription);
   const [code, setCode] = useState(storyCode);
@@ -43,6 +47,34 @@ export default function Toolbar() {
   useEffect(() => {
     loadStoryIndex().then(setExistingStories);
   }, []);
+
+  // 저장된 스토리 목록 불러오기
+  const handleOpenStoryList = async () => {
+    setShowStoryList(true);
+    setLoadingStories(true);
+    try {
+      const stories = await loadAllStories();
+      setSavedStories(stories);
+    } catch {
+      setSavedStories([]);
+    }
+    setLoadingStories(false);
+  };
+
+  // 스토리 선택해서 불러오기
+  const handleLoadStory = (story: Story) => {
+    if (nodes.length > 0) {
+      if (!confirm('현재 작업 중인 내용이 사라집니다. 계속하시겠습니까?')) {
+        return;
+      }
+    }
+    importStory(story);
+    setTitle(story.title);
+    setDescription(story.description);
+    setCode(story.code || '');
+    setFileName(story.fileName || '');
+    setShowStoryList(false);
+  };
 
   // 스토리 메타데이터 저장
   const handleSaveMeta = () => {
@@ -226,8 +258,15 @@ export default function Toolbar() {
             샘플 로드
           </button>
 
+          <button
+            onClick={handleOpenStoryList}
+            className="px-3 py-1.5 bg-[#4d6d4d] hover:bg-[#3d5d3d] text-[#f5f5f0] text-sm border border-[#3d5d3d]"
+          >
+            저장된 스토리
+          </button>
+
           <label className="px-3 py-1.5 bg-[#d0d0c8] hover:bg-[#c0c0b8] text-[#4d4d4d] text-sm cursor-pointer border border-[#b0b0a8]">
-            불러오기
+            파일 불러오기
             <input
               ref={fileInputRef}
               type="file"
@@ -438,6 +477,79 @@ export default function Toolbar() {
             <div className="p-4 border-t border-[#c0c0b8] flex justify-end">
               <button
                 onClick={() => setShowElements(false)}
+                className="px-4 py-2 bg-[#3d3d3d] hover:bg-[#2d2d2d] text-[#f5f5f0]"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 저장된 스토리 목록 모달 */}
+      {showStoryList && (
+        <div className="fixed inset-0 bg-[#f5f5f0]/90 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#f5f5f0] w-full max-w-2xl max-h-[80vh] border border-[#a0a098] flex flex-col">
+            <div className="p-4 border-b border-[#c0c0b8] flex justify-between items-center">
+              <h3 className="text-lg font-bold text-[#2d2d2d]">저장된 스토리 목록</h3>
+              <button
+                onClick={() => setShowStoryList(false)}
+                className="text-[#6b6b6b] hover:text-[#2d2d2d] text-xl"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="p-4 overflow-y-auto flex-1">
+              {loadingStories ? (
+                <div className="text-center py-8 text-[#6b6b6b]">
+                  스토리 목록을 불러오는 중...
+                </div>
+              ) : savedStories.length === 0 ? (
+                <div className="text-center py-8 text-[#8b8b8b]">
+                  <p>저장된 스토리가 없습니다.</p>
+                  <p className="text-sm mt-2">
+                    public/stories/ 폴더에 JSON 파일을 저장하고<br />
+                    index.json에 파일명을 추가해주세요.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {savedStories.map((story) => (
+                    <button
+                      key={story.id}
+                      onClick={() => handleLoadStory(story)}
+                      className="w-full p-4 bg-[#eaeae5] hover:bg-[#e0e0d8] border border-[#c0c0b8] hover:border-[#a0a098] text-left transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-[#2d2d2d]">{story.title}</h4>
+                          <p className="text-sm text-[#6b6b6b] mt-1 line-clamp-2">
+                            {story.description}
+                          </p>
+                          <div className="flex gap-3 mt-2 text-xs text-[#8b8b8b]">
+                            <span>{story.scenes?.length || 0}개 씬</span>
+                            {story.code && (
+                              <span className="bg-[#d0d0c8] px-1.5 py-0.5">
+                                코드: {story.code}
+                              </span>
+                            )}
+                            {story.fileName && (
+                              <span className="font-mono">{story.fileName}.json</span>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-[#8b8b8b] ml-2">→</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-[#c0c0b8] flex justify-end">
+              <button
+                onClick={() => setShowStoryList(false)}
                 className="px-4 py-2 bg-[#3d3d3d] hover:bg-[#2d2d2d] text-[#f5f5f0]"
               >
                 닫기

@@ -106,6 +106,8 @@ export default function NodeEditor() {
     setStartScene,
     startSceneId,
     getUsedElements,
+    setSelectedNode,
+    setSelectedEdge,
   } = useEditorStore();
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
@@ -357,19 +359,29 @@ export default function NodeEditor() {
               연결된 선택지 ({selectedNode.data.scene.choices.length})
             </label>
             <div className="space-y-2">
-              {selectedNode.data.scene.choices.map((choice, i) => (
-                <div
-                  key={choice.id}
-                  className="p-2 bg-[#f5f5f0] text-sm text-[#4d4d4d] border border-[#c0c0b8]"
-                >
-                  <div>{i + 1}. {choice.text}</div>
-                  {choice.condition && (
-                    <div className="text-xs text-[#8b8b8b] mt-1">
-                      조건: {choice.condition.target} {choice.condition.operator} {String(choice.condition.value)}
+              {selectedNode.data.scene.choices.map((choice, i) => {
+                // 해당 선택지의 엣지 ID 찾기
+                const choiceEdge = edges.find(
+                  (e) => e.source === selectedNodeId && e.data?.choice?.id === choice.id
+                );
+                return (
+                  <button
+                    key={choice.id}
+                    onClick={() => choiceEdge && setSelectedEdge(choiceEdge.id)}
+                    className="w-full p-2 bg-[#f5f5f0] text-sm text-[#4d4d4d] border border-[#c0c0b8] text-left hover:bg-[#e8e8e3] hover:border-[#a0a098] transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span>{i + 1}. {choice.text}</span>
+                      <span className="text-xs text-[#8b8b8b]">→</span>
                     </div>
-                  )}
-                </div>
-              ))}
+                    {choice.condition && (
+                      <div className="text-xs text-[#8b8b8b] mt-1">
+                        조건: {choice.condition.target} {choice.condition.operator} {String(choice.condition.value)}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
               {selectedNode.data.scene.choices.length === 0 && (
                 <p className="text-[#8b8b8b] text-xs">
                   다른 노드로 연결하면 선택지가 추가됩니다
@@ -414,15 +426,27 @@ export default function NodeEditor() {
           </div>
 
           {/* 연결 정보 */}
-          <div className="p-3 bg-[#f5f5f0] border border-[#c0c0b8]">
-            <p className="text-sm text-[#6b6b6b]">
-              <span className="text-[#8b8b8b]">출발:</span>{' '}
-              {nodes.find((n) => n.id === selectedEdge.source)?.data.scene.title || selectedEdge.source}
-            </p>
-            <p className="text-sm text-[#6b6b6b] mt-1">
-              <span className="text-[#8b8b8b]">도착:</span>{' '}
-              {nodes.find((n) => n.id === selectedEdge.target)?.data.scene.title || selectedEdge.target}
-            </p>
+          <div className="p-3 bg-[#f5f5f0] border border-[#c0c0b8] space-y-2">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-[#8b8b8b] w-10">출발:</span>
+              <button
+                onClick={() => setSelectedNode(selectedEdge.source)}
+                className="flex-1 text-left px-2 py-1 bg-[#eaeae5] hover:bg-[#e0e0d8] border border-[#c0c0b8] hover:border-[#a0a098] text-[#4d4d4d] transition-colors"
+              >
+                {nodes.find((n) => n.id === selectedEdge.source)?.data.scene.title || selectedEdge.source}
+                <span className="text-xs text-[#8b8b8b] ml-2">→</span>
+              </button>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-[#8b8b8b] w-10">도착:</span>
+              <button
+                onClick={() => setSelectedNode(selectedEdge.target)}
+                className="flex-1 text-left px-2 py-1 bg-[#eaeae5] hover:bg-[#e0e0d8] border border-[#c0c0b8] hover:border-[#a0a098] text-[#4d4d4d] transition-colors"
+              >
+                {nodes.find((n) => n.id === selectedEdge.target)?.data.scene.title || selectedEdge.target}
+                <span className="text-xs text-[#8b8b8b] ml-2">→</span>
+              </button>
+            </div>
           </div>
 
           {/* 조건 설정 */}
