@@ -117,13 +117,52 @@ export default function CodePlayPage() {
 
   // 게임 플레이 화면
   return (
-    <main className="min-h-screen flex">
+    <main className="min-h-screen flex flex-col md:flex-row">
+      {/* 모바일: 상단 사이드바 / 데스크톱: 우측 사이드바 (order로 위치 조정) */}
+      {showSidebar && gameState && (
+        <aside className="
+          w-full md:w-80
+          bg-[#eaeae5]
+          border-b md:border-b-0 md:border-l border-[#c0c0b8]
+          p-4
+          space-y-4
+          overflow-y-auto
+          order-first md:order-last
+          max-h-[50vh] md:max-h-none
+        ">
+          {/* 모바일에서 접기 버튼 */}
+          <div className="flex justify-between items-center md:hidden mb-2">
+            <span className="text-sm font-medium text-[#4d4d4d]">캐릭터 정보</span>
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="text-[#6b6b6b] hover:text-[#2d2d2d] text-xl leading-none"
+            >
+              &times;
+            </button>
+          </div>
+
+          <StatsPanel />
+          <InventoryPanel />
+
+          {/* 진행 정보 */}
+          <div className="bg-[#f5f5f0] p-4 border border-[#c0c0b8]">
+            <h3 className="text-lg font-bold text-[#2d2d2d] mb-3 border-b border-[#c0c0b8] pb-2">
+              진행 정보
+            </h3>
+            <div className="text-sm text-[#6b6b6b] space-y-1">
+              <p>방문한 씬: {gameState.history.length}개</p>
+              <p>획득한 플래그: {Object.keys(gameState.flags).length}개</p>
+            </div>
+          </div>
+        </aside>
+      )}
+
       {/* 메인 게임 영역 */}
-      <div className="flex-1 p-6 max-w-4xl mx-auto">
+      <div className="flex-1 p-4 md:p-6 max-w-4xl mx-auto w-full">
         {/* 상단 바 */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold text-[#2d2d2d]">{story?.title}</h1>
-          <div className="flex gap-2">
+          <h1 className="text-lg md:text-xl font-bold text-[#2d2d2d] truncate">{story?.title}</h1>
+          <div className="flex gap-2 flex-shrink-0">
             <button
               onClick={() => setShowSidebar(!showSidebar)}
               className="px-3 py-1 bg-[#e0e0d8] hover:bg-[#d0d0c8] text-[#4d4d4d] text-sm border border-[#c0c0b8]"
@@ -132,7 +171,7 @@ export default function CodePlayPage() {
             </button>
             <button
               onClick={handleRestart}
-              className="px-3 py-1 bg-[#e0e0d8] hover:bg-[#d0d0c8] text-[#4d4d4d] text-sm border border-[#c0c0b8]"
+              className="px-3 py-1 bg-[#e0e0d8] hover:bg-[#d0d0c8] text-[#4d4d4d] text-sm border border-[#c0c0b8] hidden sm:block"
             >
               처음부터
             </button>
@@ -157,25 +196,6 @@ export default function CodePlayPage() {
           </div>
         )}
       </div>
-
-      {/* 사이드바 (스탯 & 인벤토리) */}
-      {showSidebar && gameState && (
-        <aside className="w-80 bg-[#eaeae5] border-l border-[#c0c0b8] p-4 space-y-4 overflow-y-auto">
-          <StatsPanel />
-          <InventoryPanel />
-
-          {/* 진행 정보 */}
-          <div className="bg-[#f5f5f0] p-4 border border-[#c0c0b8]">
-            <h3 className="text-lg font-bold text-[#2d2d2d] mb-3 border-b border-[#c0c0b8] pb-2">
-              진행 정보
-            </h3>
-            <div className="text-sm text-[#6b6b6b] space-y-1">
-              <p>방문한 씬: {gameState.history.length}개</p>
-              <p>획득한 플래그: {Object.keys(gameState.flags).length}개</p>
-            </div>
-          </div>
-        </aside>
-      )}
     </main>
   );
 }

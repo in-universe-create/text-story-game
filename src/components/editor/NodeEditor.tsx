@@ -93,6 +93,8 @@ const ITEM_ACTIONS = [
   { value: 'remove', label: '소모' },
 ];
 
+const generateId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
 export default function NodeEditor() {
   const {
     nodes,
@@ -108,6 +110,8 @@ export default function NodeEditor() {
     getUsedElements,
     setSelectedNode,
     setSelectedEdge,
+    addNode,
+    addEdge,
   } = useEditorStore();
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
@@ -124,8 +128,14 @@ export default function NodeEditor() {
   const [text, setText] = useState('');
   const [isEnding, setIsEnding] = useState(false);
 
+  // 선택지 추가 모달 상태
+  const [showAddChoice, setShowAddChoice] = useState(false);
+  const [newChoiceText, setNewChoiceText] = useState('새 선택지');
+  const [newChoiceTarget, setNewChoiceTarget] = useState<string>('new'); // 'new' 또는 기존 씬 id
+
   // 선택지 편집 상태
   const [choiceText, setChoiceText] = useState('');
+  const [showChangeTarget, setShowChangeTarget] = useState(false);
 
   // 조건 편집 상태
   const [hasCondition, setHasCondition] = useState(false);
@@ -152,6 +162,9 @@ export default function NodeEditor() {
 
   // 선택된 엣지가 변경되면 상태 업데이트
   useEffect(() => {
+    // 엣지 선택 시 드롭다운 초기화
+    setShowChangeTarget(false);
+
     const edgeData = selectedEdge?.data as EdgeData | undefined;
     if (edgeData?.choice) {
       setChoiceText(edgeData.choice.text);
@@ -271,6 +284,88 @@ export default function NodeEditor() {
     setStartScene(selectedNodeId);
   };
 
+  // 선택지 추가 (씬 편집에서)
+  const handleAddChoice = () => {
+    if (!selectedNodeId) return;
+
+    let targetSceneId = newChoiceTarget;
+
+    // 새 씬 생성이면 씬 먼저 생성
+    if (newChoiceTarget === 'new') {
+      const newSceneId = generateId();
+      const currentNode = nodes.find((n) => n.id === selectedNodeId);
+      const newPosition = {
+        x: (currentNode?.position.x || 0) + 300,
+        y: (currentNode?.position.y || 0) + 100,
+      };
+
+      addNode(
+        {
+          id: newSceneId,
+          title: '새 씬',
+          text: '내용을 입력하세요...',
+          choices: [],
+        },
+        newPosition
+      );
+
+      targetSceneId = newSceneId;
+    }
+
+    // 선택지 추가
+    const choiceId = generateId();
+    addEdge(selectedNodeId, targetSceneId, {
+      id: choiceId,
+      text: newChoiceText,
+      targetSceneId: targetSceneId,
+    });
+
+    // 모달 닫고 초기화
+    setShowAddChoice(false);
+    setNewChoiceText('새 선택지');
+    setNewChoiceTarget('new');
+  };
+
+  // 선택지 도착 씬 변경
+  const handleChangeTargetScene = (newTargetId: string) => {
+    if (!selectedEdgeId || !selectedEdge) return;
+
+    const currentChoice = selectedEdge.data?.choice;
+    if (!currentChoice) return;
+
+    // 새 씬 생성이면 씬 먼저 생성
+    let targetSceneId = newTargetId;
+    if (newTargetId === 'new') {
+      const newSceneId = generateId();
+      const sourceNode = nodes.find((n) => n.id === selectedEdge.source);
+      const newPosition = {
+        x: (sourceNode?.position.x || 0) + 300,
+        y: (sourceNode?.position.y || 0) + 100,
+      };
+
+      addNode(
+        {
+          id: newSceneId,
+          title: '새 씬',
+          text: '내용을 입력하세요...',
+          choices: [],
+        },
+        newPosition
+      );
+
+      targetSceneId = newSceneId;
+    }
+
+    // 기존 엣지 삭제하고 새로 생성 (target 변경)
+    deleteEdge(selectedEdgeId);
+    const newEdgeChoiceId = generateId();
+    addEdge(selectedEdge.source, targetSceneId, {
+      ...currentChoice,
+      id: newEdgeChoiceId,
+      targetSceneId: targetSceneId,
+    });
+  };
+
   if (!selectedNode && !selectedEdge) {
     return (
       <div className="w-80 bg-[#eaeae5] border-l border-[#c0c0b8] p-4">
@@ -355,15 +450,24 @@ export default function NodeEditor() {
 
           {/* 선택지 목록 */}
           <div>
-            <label className="block text-sm text-[#6b6b6b] mb-2">
-              연결된 선택지 ({selectedNode.data.scene.choices.length})
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm text-[#6b6b6b]">
+                연결된 선택지 ({selectedNode.data.scene.choices.length})
+              </label>
+              <button
+                onClick={() => setShowAddChoice(true)}
+                className="text-xs px-2 py-1 bg-[#4d6d4d] hover:bg-[#3d5d3d] text-[#f5f5f0]"
+              >
+                + 선택지 추가
+              </button>
+            </div>
             <div className="space-y-2">
               {selectedNode.data.scene.choices.map((choice, i) => {
                 // 해당 선택지의 엣지 ID 찾기
                 const choiceEdge = edges.find(
                   (e) => e.source === selectedNodeId && e.data?.choice?.id === choice.id
                 );
+                const targetScene = nodes.find((n) => n.id === choice.targetSceneId);
                 return (
                   <button
                     key={choice.id}
@@ -374,9 +478,12 @@ export default function NodeEditor() {
                       <span>{i + 1}. {choice.text}</span>
                       <span className="text-xs text-[#8b8b8b]">→</span>
                     </div>
+                    <div className="text-xs text-[#8b8b8b] mt-1">
+                      → {targetScene?.data.scene.title || '알 수 없는 씬'}
+                    </div>
                     {choice.condition && (
-                      <div className="text-xs text-[#8b8b8b] mt-1">
-                        조건: {choice.condition.target} {choice.condition.operator} {String(choice.condition.value)}
+                      <div className="text-xs text-[#a08060] mt-1">
+                        [조건] {choice.condition.target} {choice.condition.operator} {String(choice.condition.value)}
                       </div>
                     )}
                   </button>
@@ -384,10 +491,73 @@ export default function NodeEditor() {
               })}
               {selectedNode.data.scene.choices.length === 0 && (
                 <p className="text-[#8b8b8b] text-xs">
-                  다른 노드로 연결하면 선택지가 추가됩니다
+                  선택지 추가 버튼을 누르거나<br />
+                  캔버스에서 노드를 연결하세요
                 </p>
               )}
             </div>
+
+            {/* 선택지 추가 모달 */}
+            {showAddChoice && (
+              <div className="fixed inset-0 bg-[#f5f5f0]/90 z-50 flex items-center justify-center p-4">
+                <div className="bg-[#f5f5f0] w-full max-w-sm border border-[#a0a098]">
+                  <div className="p-4 border-b border-[#c0c0b8]">
+                    <h3 className="text-lg font-bold text-[#2d2d2d]">선택지 추가</h3>
+                  </div>
+
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <label className="block text-sm text-[#6b6b6b] mb-1">선택지 텍스트</label>
+                      <input
+                        type="text"
+                        value={newChoiceText}
+                        onChange={(e) => setNewChoiceText(e.target.value)}
+                        className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-3 py-2 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm text-[#6b6b6b] mb-1">연결할 씬</label>
+                      <select
+                        value={newChoiceTarget}
+                        onChange={(e) => setNewChoiceTarget(e.target.value)}
+                        className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-3 py-2 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
+                      >
+                        <option value="new">✨ 새 씬 만들기</option>
+                        <optgroup label="기존 씬">
+                          {nodes
+                            .filter((n) => n.id !== selectedNodeId)
+                            .map((n) => (
+                              <option key={n.id} value={n.id}>
+                                {n.data.scene.title}
+                              </option>
+                            ))}
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-t border-[#c0c0b8] flex justify-end gap-2">
+                    <button
+                      onClick={() => {
+                        setShowAddChoice(false);
+                        setNewChoiceText('새 선택지');
+                        setNewChoiceTarget('new');
+                      }}
+                      className="px-4 py-2 bg-[#d0d0c8] hover:bg-[#c0c0b8] text-[#3d3d3d] text-sm"
+                    >
+                      취소
+                    </button>
+                    <button
+                      onClick={handleAddChoice}
+                      className="px-4 py-2 bg-[#3d3d3d] hover:bg-[#2d2d2d] text-[#f5f5f0] text-sm"
+                    >
+                      추가
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 삭제 버튼 */}
@@ -439,14 +609,55 @@ export default function NodeEditor() {
             </div>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-[#8b8b8b] w-10">도착:</span>
-              <button
-                onClick={() => setSelectedNode(selectedEdge.target)}
-                className="flex-1 text-left px-2 py-1 bg-[#eaeae5] hover:bg-[#e0e0d8] border border-[#c0c0b8] hover:border-[#a0a098] text-[#4d4d4d] transition-colors"
-              >
-                {nodes.find((n) => n.id === selectedEdge.target)?.data.scene.title || selectedEdge.target}
-                <span className="text-xs text-[#8b8b8b] ml-2">→</span>
-              </button>
+              <div className="flex-1 flex items-center gap-1">
+                <button
+                  onClick={() => setSelectedNode(selectedEdge.target)}
+                  className="flex-1 text-left px-2 py-1 bg-[#eaeae5] hover:bg-[#e0e0d8] border border-[#c0c0b8] hover:border-[#a0a098] text-[#4d4d4d] transition-colors truncate"
+                >
+                  {nodes.find((n) => n.id === selectedEdge.target)?.data.scene.title || selectedEdge.target}
+                  <span className="text-xs text-[#8b8b8b] ml-2">→</span>
+                </button>
+                <button
+                  onClick={() => setShowChangeTarget(!showChangeTarget)}
+                  className="px-2 py-1 bg-[#d0d0c8] hover:bg-[#c0c0b8] border border-[#b0b0a8] text-[#4d4d4d] text-xs"
+                  title="도착 씬 변경"
+                >
+                  변경
+                </button>
+              </div>
             </div>
+
+            {/* 도착 씬 변경 드롭다운 */}
+            {showChangeTarget && (
+              <div className="mt-2 p-2 bg-[#eaeae5] border border-[#c0c0b8]">
+                <label className="block text-xs text-[#8b8b8b] mb-1">새로운 도착 씬 선택</label>
+                <select
+                  defaultValue={selectedEdge.target}
+                  onChange={(e) => {
+                    handleChangeTargetScene(e.target.value);
+                    setShowChangeTarget(false);
+                  }}
+                  className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-2 py-1.5 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
+                >
+                  <option value="new">✨ 새 씬 만들기</option>
+                  <optgroup label="기존 씬">
+                    {nodes
+                      .filter((n) => n.id !== selectedEdge.source)
+                      .map((n) => (
+                        <option key={n.id} value={n.id}>
+                          {n.data.scene.title} {n.id === selectedEdge.target ? '(현재)' : ''}
+                        </option>
+                      ))}
+                  </optgroup>
+                </select>
+                <button
+                  onClick={() => setShowChangeTarget(false)}
+                  className="mt-2 w-full px-2 py-1 bg-[#d0d0c8] hover:bg-[#c0c0b8] text-[#4d4d4d] text-xs border border-[#b0b0a8]"
+                >
+                  취소
+                </button>
+              </div>
+            )}
           </div>
 
           {/* 조건 설정 */}
