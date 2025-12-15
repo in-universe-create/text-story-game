@@ -1,0 +1,346 @@
+{
+  "id": "1765761051994-lkmllap",
+  "title": "?",
+  "description": "?",
+  "code": "기이현상",
+  "fileName": "phenomena",
+  "startSceneId": "1765761982494-ruaa8cg",
+  "scenes": [
+    {
+      "id": "1765761982494-ruaa8cg",
+      "title": "AM",
+      "text": "... .... ... ....... .... \n\n새벽을 깨우는 소리가 요란하다. \n\n자기 주장을 해대는 휴대폰을 확인하면\n알람이 가득하다. ",
+      "choices": [
+        {
+          "id": "1765764114013-w7pm6br",
+          "text": "메시지 (3)",
+          "targetSceneId": "1765764114013-obbj5yq",
+          "condition": {
+            "type": "flag",
+            "target": "message1False",
+            "operator": "eq",
+            "value": true
+          },
+          "conditionMode": "disable"
+        },
+        {
+          "id": "1765764129142-ns9idi7",
+          "text": "부재중 통화 (1)",
+          "targetSceneId": "1765764129141-nyjbdu4"
+        },
+        {
+          "id": "1765770175190-n1ki90b",
+          "text": "부재중 통화 (4)",
+          "targetSceneId": "1765769089442-qu9xmbf"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765764114013-obbj5yq",
+      "title": "메시지",
+      "text": "마 주임\n바빠? \n메세지 보면 연락해\n\n같이 일했던 과거 인연으로부터 온 메세지다.",
+      "choices": [
+        {
+          "id": "1765769089442-k0ma8n0",
+          "text": "통화한다",
+          "targetSceneId": "1765769089442-qu9xmbf"
+        },
+        {
+          "id": "1765769110976-jhd6vfu",
+          "text": "메세지를 보낸다",
+          "targetSceneId": "1765769110976-84p8wuu",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "intelligence",
+              "action": "remove",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "id": "1765769254288-fhjx6ot",
+          "text": "무시한다",
+          "targetSceneId": "1765761982494-ruaa8cg",
+          "effects": [
+            {
+              "type": "flag",
+              "target": "message1False",
+              "action": "add",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765764129141-nyjbdu4",
+      "title": "?",
+      "text": "발신자를 확인하는데 밖이 소란스럽다. \n\nㅡ ·······\n\n문 열리는 소리가 들린다. \n침입자다.",
+      "choices": [
+        {
+          "id": "1765764982138-6oe6yup",
+          "text": "가만히 있는다",
+          "targetSceneId": "1765764982138-4goh5d9"
+        },
+        {
+          "id": "1765764993942-8c5q0c6",
+          "text": "공격한다",
+          "targetSceneId": "1765764993941-bcu3a4b",
+          "effects": [
+            {
+              "type": "stat",
+              "target": "hp",
+              "action": "remove",
+              "value": 3
+            },
+            {
+              "type": "relation",
+              "target": "무",
+              "action": "remove",
+              "value": 5
+            }
+          ]
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765764982138-4goh5d9",
+      "title": "침입자?",
+      "text": "\"무례를 저질러 죄송합니다. 상황이 상황이라 부득이하게 방문하였습니다.\"\n\n익숙한 얼굴.\n기 씨 성의 가신이다. ",
+      "choices": [
+        {
+          "id": "1765765335183-60jo3c7",
+          "text": "상황?",
+          "targetSceneId": "1765765335183-td20wfz"
+        },
+        {
+          "id": "1765785932345-k1xeilm",
+          "text": "어떻게 문을 열고 들어왔는지",
+          "targetSceneId": "1765773171927-na10a4i"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765764993941-bcu3a4b",
+      "title": "성공? 실패?",
+      "text": "둔탁한 소리와 함께 \n신체를 타고 흘러들어오는 진동. \n\n한숨 소리가 들린다. ",
+      "choices": [
+        {
+          "id": "1765776242735-ccpbuqb",
+          "text": "아.",
+          "targetSceneId": "1765764982138-4goh5d9"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765765335183-td20wfz",
+      "title": "무",
+      "text": "무의 시선이 휴대폰으로 향한다. \n\n\"확인 중이시라면 이미 알고 계실 내용입니다.\" \n\n잠깐 먼 곳을 보던 그가 품에서 무언가 꺼낸다. ",
+      "choices": [
+        {
+          "id": "1765768306140-u21wkyf",
+          "text": "가만히 지켜본다",
+          "targetSceneId": "1765768306140-mmwk17f"
+        },
+        {
+          "id": "1765768315252-2ykq7kr",
+          "text": "공격하여 무언가를 빼앗는다",
+          "targetSceneId": "1765768315252-lpreapr",
+          "effects": [
+            {
+              "type": "relation",
+              "target": "무",
+              "action": "remove",
+              "value": 5
+            },
+            {
+              "type": "stat",
+              "target": "reputation",
+              "action": "remove",
+              "value": 5
+            },
+            {
+              "type": "item",
+              "target": "silent",
+              "action": "add",
+              "value": 1,
+              "itemName": "녹색 환",
+              "itemDescription": "손으로 비비면 5분간 반경 1m 안의 소음을 밖에서 들을 수 없다."
+            }
+          ]
+        },
+        {
+          "id": "1765786080945-7bz8o9y",
+          "text": "허튼 짓하지 마세요.",
+          "targetSceneId": "1765773171927-na10a4i",
+          "effects": [
+            {
+              "type": "relation",
+              "target": "무",
+              "action": "add",
+              "value": 10
+            }
+          ]
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765768306140-mmwk17f",
+      "title": "가제: 리미널 게이트",
+      "text": "녹색 환이 무의 손에서 뭉개진다. \n가루가 방 안에서 흩어진다. \n\n\"주임님은 지금부터 새로운 현상을 연구하시게 될 겁니다.\"\n\n무를 통해 전달 받은 사항은 아래와 같다. \n\n- 9일 전, 최초의 행방불명자 52세의 김 모 씨를 시작하여 원주시 근방 리에서 사람이 사라지고 있다. \n- 현재까지 확인된 바에 따르면, 특정 지역에 진입한 인원 혹은 해당 지역에서 생활 반경을 유지하던 인원만이 기이 현장에 발을 들일 수 있다. \n- 귀환자는 단 두명.\n- 특정 조건 하에서 인간을 현실에서 배제하는 비인격적 현상으로 추측",
+      "choices": [
+        {
+          "id": "1765786000491-mcpsqer",
+          "text": "to be continue.....",
+          "targetSceneId": "1765773171927-na10a4i"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765768315252-lpreapr",
+      "title": "녹색 환",
+      "text": "\"해칠 의도는 없습니다.\" \n\n무감한 어조로 답한 무가 휴대폰을 줍는다. \n\n\"그저 주변을 차단하고 싶었을 뿐.\" \n\n허락도 없이 휴대폰을 챙긴 무의 시선이 차갑다. \n\n\"체력 소모는 상호 간 이만하면 되었죠. 아래서 기다리도록 하겠습니다.\"",
+      "choices": [
+        {
+          "id": "1765778071722-i6mlen4",
+          "text": "집 밖으로 나선다",
+          "targetSceneId": "1765775900395-tyw4xhh"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765769089442-qu9xmbf",
+      "title": "통화: 이서준",
+      "text": "짧다. 한 번 울리고 바로 받는다. \n\n\"마 주임, 휴대폰 확인 제때 안 해?\"\n\"후, 아무튼 혼자야?\"",
+      "choices": [
+        {
+          "id": "1765770148493-w9y55oh",
+          "text": "혼자다",
+          "targetSceneId": "1765770148492-jzw9i4h"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765769110976-84p8wuu",
+      "title": "메세지: 서준",
+      "text": "...\n그냥 내가 연락할게.\n제대로 받기나 해.",
+      "choices": [
+        {
+          "id": "1765770334811-e5pgx9s",
+          "text": "전화를 받는다",
+          "targetSceneId": "1765769089442-qu9xmbf"
+        },
+        {
+          "id": "1765770421755-11vknjp",
+          "text": "무시한다",
+          "targetSceneId": "1765764129141-nyjbdu4"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765770148492-jzw9i4h",
+      "title": "통화: 이서준",
+      "text": "- 챙기면서 들어. 지금 설명할 시간 없어.\n- 자세한 건 만나서 말해줄게. 원주역으로 와. ",
+      "choices": [
+        {
+          "id": "1765771544607-p7ot2z8",
+          "text": "원주역?",
+          "targetSceneId": "1765771544607-93qn0q6"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765771544607-93qn0q6",
+      "title": "원주 역",
+      "text": "잠깐의 침묵 후 핵심만 던지듯 말한다. \n\n- 정확한 발발 시점은 특정 못했어.\n- 사흘 전에야 최초로 포착됐고. \n- 원주 근방에서 지역 단위의 인적 소실이 확인 되었어. 영향 범위는 리.\n\n말을 멈췄다가 낮게 한숨을 쉰다. \n\n- 그리고 기존 분류랑 안 맞아.\n- 그래서 마 주임 손이 필요해.",
+      "choices": [
+        {
+          "id": "1765773133615-qj3atib",
+          "text": "전화를 받으며 이동한다",
+          "targetSceneId": "1765773133615-9u75o43"
+        },
+        {
+          "id": "1765773171927-mfb7szf",
+          "text": "기타",
+          "targetSceneId": "1765773171927-na10a4i"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765773133615-9u75o43",
+      "title": "이동?",
+      "text": "- 이동 비용은 나중에 청구하고.\n\n특별한 대응 없이 전화가 지속됨을 허락으로 받아들인 걸까. \n한결 편한 목소리로 서준이 말한다. \n전화로 전달될 수 있는 정보가 서준의 입에서 흘러나오는 중, \n\n전부터 불편하게 들렸던 잡음이 거세진다.\n\n- 마 주임, 혹시 ",
+      "choices": [
+        {
+          "id": "1765775321870-swenra4",
+          "text": "...여보세요?",
+          "targetSceneId": "1765775321870-5nyq8q2"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765773171927-na10a4i",
+      "title": "수산에게 문의",
+      "text": "수산에게 문의하세요 ♥",
+      "choices": [],
+      "isEnding": false
+    },
+    {
+      "id": "1765775321870-5nyq8q2",
+      "title": "...",
+      "text": "차가운 공기가 텁텁해진다. \n\n\"뭘 그렇게 바삐 움직이시나, 마 주임.\"\n\n엄지와 검지를 맞댄 채 마찰시킨 괴한이 후, 하고 손에 묻은 녹색 분진을 털어낸다. \n\n\"순서가 틀린 듯한데 그건 나중에 이야기하고. 차에 타게.\"\n\n열린 뒷좌석 내부가 까맣다.",
+      "choices": [
+        {
+          "id": "1765775993037-7zp7zo4",
+          "text": "차에 탄다",
+          "targetSceneId": "1765773171927-na10a4i"
+        },
+        {
+          "id": "1765776007476-pd1pl8m",
+          "text": "차에 타지 않는다",
+          "targetSceneId": "1765773171927-na10a4i"
+        }
+      ],
+      "isEnding": false
+    },
+    {
+      "id": "1765775900395-tyw4xhh",
+      "title": "AM",
+      "text": "집 밖으로 나온 자신을 보고 \n무가 뒷좌석을 연다. \n\n\"우리 직원이 도통 신뢰를 주기 어려운 사람이던가.\"\n\"아니면, 마 주임이 새로운 취향에 눈을 떴든지.\n",
+      "choices": [
+        {
+          "id": "1765785891153-gxzrhis",
+          "text": "to be continue.....",
+          "targetSceneId": "1765773171927-na10a4i"
+        }
+      ],
+      "isEnding": false
+    }
+  ],
+  "initialStats": {
+    "hp": 100,
+    "maxHp": 100,
+    "strength": 10,
+    "intelligence": 10,
+    "agility": 10,
+    "stress": 0,
+    "reputation": 50,
+    "relationship": 50,
+    "gold": 100
+  },
+  "initialItems": []
+}
