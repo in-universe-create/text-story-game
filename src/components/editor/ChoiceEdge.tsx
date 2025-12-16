@@ -85,7 +85,9 @@ function ChoiceEdge({
             border ${hasCondition ? 'border-[#b0a090]' : 'border-[#a0a098]'}
           `}
         >
-          <div className="truncate">{choice?.text || '선택지'}</div>
+          <div className={`truncate ${choice?.text ? '' : 'italic opacity-60'}`}>
+            {choice?.text || '(선택지 입력)'}
+          </div>
           {(hasCondition || hasEffects) && (
             <div className="flex gap-1 mt-0.5 text-[10px] opacity-70">
               {hasCondition && <span>[조건]</span>}

@@ -133,7 +133,7 @@ export default function NodeEditor() {
 
   // 선택지 추가 모달 상태
   const [showAddChoice, setShowAddChoice] = useState(false);
-  const [newChoiceText, setNewChoiceText] = useState('새 선택지');
+  const [newChoiceText, setNewChoiceText] = useState('');
   const [newChoiceTarget, setNewChoiceTarget] = useState<string>('new'); // 'new' 또는 기존 씬 id
 
   // 선택지 편집 상태
@@ -335,7 +335,7 @@ export default function NodeEditor() {
 
     // 모달 닫고 초기화
     setShowAddChoice(false);
-    setNewChoiceText('새 선택지');
+    setNewChoiceText('');
     setNewChoiceTarget('new');
   };
 
@@ -678,6 +678,7 @@ export default function NodeEditor() {
                         type="text"
                         value={newChoiceText}
                         onChange={(e) => setNewChoiceText(e.target.value)}
+                        placeholder="선택지 내용을 입력하세요..."
                         className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-3 py-2 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
                       />
                     </div>
@@ -707,7 +708,7 @@ export default function NodeEditor() {
                     <button
                       onClick={() => {
                         setShowAddChoice(false);
-                        setNewChoiceText('새 선택지');
+                        setNewChoiceText('');
                         setNewChoiceTarget('new');
                       }}
                       className="px-4 py-2 bg-[#d0d0c8] hover:bg-[#c0c0b8] text-[#3d3d3d] text-sm"
@@ -757,6 +758,7 @@ export default function NodeEditor() {
               value={choiceText}
               onChange={(e) => setChoiceText(e.target.value)}
               onBlur={handleSaveEdge}
+              placeholder="선택지 내용을 입력하세요..."
               className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-3 py-2 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080]"
             />
           </div>
