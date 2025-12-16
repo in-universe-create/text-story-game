@@ -159,7 +159,7 @@ export default function EditorPage() {
       const newScene: Scene = {
         id: generateId(),
         title: '새 씬',
-        text: '내용을 입력하세요...',
+        text: '',
         choices: [],
       };
 
