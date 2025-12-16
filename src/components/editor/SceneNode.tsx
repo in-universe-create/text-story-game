@@ -48,8 +48,8 @@ function SceneNode({ data, selected }: SceneNodeProps) {
 
       {/* 본문 */}
       <div className="px-3 py-2">
-        <p className="text-[#4d4d4d] text-xs line-clamp-3">
-          {scene.text || '내용을 입력하세요...'}
+        <p className={`text-xs line-clamp-3 ${scene.text ? 'text-[#4d4d4d]' : 'text-[#a0a0a0] italic'}`}>
+          {scene.text || '(내용 없음)'}
         </p>
       </div>
 

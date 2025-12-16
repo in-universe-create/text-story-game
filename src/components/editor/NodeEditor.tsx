@@ -316,7 +316,7 @@ export default function NodeEditor() {
         {
           id: newSceneId,
           title: '새 씬',
-          text: '내용을 입력하세요...',
+          text: '',
           choices: [],
         },
         newPosition
@@ -360,7 +360,7 @@ export default function NodeEditor() {
         {
           id: newSceneId,
           title: '새 씬',
-          text: '내용을 입력하세요...',
+          text: '',
           choices: [],
         },
         newPosition
@@ -426,6 +426,7 @@ export default function NodeEditor() {
               onChange={(e) => setText(e.target.value)}
               onBlur={handleSaveNode}
               rows={8}
+              placeholder="스토리 내용을 입력하세요..."
               className="w-full bg-[#f5f5f0] border border-[#c0c0b8] px-3 py-2 text-[#2d2d2d] text-sm focus:outline-none focus:border-[#808080] resize-none"
             />
           </div>
