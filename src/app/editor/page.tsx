@@ -135,7 +135,7 @@ export default function EditorPage() {
       const choiceId = generateId();
       const choice: Choice = {
         id: choiceId,
-        text: '새 선택지',
+        text: '',
         targetSceneId: connection.target,
       };
 
